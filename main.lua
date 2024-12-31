@@ -2,9 +2,9 @@ local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Window = Rayfield:CreateWindow({
    Name = "👹 Scary Shushi Script [Chapter 2!]",
-   Icon = 0, -- Icon in Topbar. Can use Lucide Icons (string) or Roblox Image (number). 0 to use no icon (default).
-   LoadingTitle = "have fun",
-   LoadingSubtitle = "by zay",
+   Icon = 112992462475311, -- Icon in Topbar. Can use Lucide Icons (string) or Roblox Image (number). 0 to use no icon (default).
+   LoadingTitle = "It’s not cheating; it’s a feature!",
+   LoadingSubtitle = "-zay",
    Theme = "Default", -- Check https://docs.sirius.menu/rayfield/configuration/themes
 
    DisableRayfieldPrompts = false,
@@ -38,189 +38,414 @@ local MainTab = Window:CreateTab("Home", nil) -- Title, Image
 local Section = MainTab:CreateSection("Main")
 
 local Button = MainTab:CreateButton({
-   Name = "Workspace",
-   Callback = function()
-        -- Teleport to Starting Position Script
+    Name = "Force Third Person",
+    Callback = function()
+        local player = game.Players.LocalPlayer
+        local camera = game.Workspace.CurrentCamera
 
-local player = game.Players.LocalPlayer
-local startingPosition = Vector3.new(-54.86871337890625, 952.1504516601562, 55.60028839111328)
+        -- Force camera mode to Classic
+        player.CameraMode = Enum.CameraMode.Classic
 
--- Teleport function to Starting location
-local function teleportToStarting()
-    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-        local currentRotation = player.Character.HumanoidRootPart.CFrame.Rotation
-        player.Character:SetPrimaryPartCFrame(CFrame.new(startingPosition) * CFrame.Angles(0, currentRotation.Y, 0))
-    end
-end
+        -- Adjust the camera zoom distance
+        player.CameraMaxZoomDistance = 12 -- Set this to desired max distance
+        player.CameraMinZoomDistance = 12 -- Lock zoom to always stay at this distance
 
--- Call the teleport function
-teleportToStarting()
-  
+        -- Continuously check and enforce third-person
+        game:GetService("RunService").RenderStepped:Connect(function()
+            if player.CameraMode ~= Enum.CameraMode.Classic then
+                player.CameraMode = Enum.CameraMode.Classic
+            end
+        end)
+        
+        print("Force Third Person Mode Activated")
     end,
 })
 
+-- Teleport to Workspace Button
 local Button = MainTab:CreateButton({
-   Name = "Monster",
-   Callback = function()
-       -- Teleport to Monster Position Script
-
-local player = game.Players.LocalPlayer
-local monsterPosition = Vector3.new(7.668905735015869, 956.4793090820312, 67.62030029296875)
-
--- Teleport function to Monster location
-local function teleportToMonster()
-    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-        local currentRotation = player.Character.HumanoidRootPart.CFrame.Rotation
-        player.Character:SetPrimaryPartCFrame(CFrame.new(monsterPosition) * CFrame.Angles(0, currentRotation.Y, 0))
-    end
-end
-
--- Call the teleport function
-teleportToMonster()
-
-   end,
+    Name = "Teleport to Workspace",
+    Callback = function()
+        local player = game.Players.LocalPlayer
+        local workspacePosition = Vector3.new(-54.764156341552734, 952.2335205078125, 53.010135650634766)
+        
+        if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            local currentRotation = player.Character.HumanoidRootPart.CFrame.Rotation
+            player.Character:SetPrimaryPartCFrame(CFrame.new(workspacePosition) * CFrame.Angles(0, currentRotation.Y, 0))
+        else
+            warn("Teleport failed! Character or HumanoidRootPart not found.")
+        end
+    end,
 })
 
+-- Teleport to Monster Position Button
 local Button = MainTab:CreateButton({
-   Name = "Rice",
-   Callback = function()
-       -- Teleport to Night Grains Position Script
-
-local player = game.Players.LocalPlayer
-local nightGrainsPosition = Vector3.new(-693.851318359375, -156.176513671875, 757.2453002929688)
-
--- Teleport function to Night Grains location
-local function teleportToNightGrains()
-    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-        local currentRotation = player.Character.HumanoidRootPart.CFrame.Rotation
-        player.Character:SetPrimaryPartCFrame(CFrame.new(nightGrainsPosition) * CFrame.Angles(0, currentRotation.Y, 0))
-    end
-end
-
--- Call the teleport function
-teleportToNightGrains()
-
-   end,
+    Name = "Teleport to Monster",
+    Callback = function()
+        local player = game.Players.LocalPlayer
+        local monsterPosition = Vector3.new(7.668905735015869, 956.4793090820312, 67.62030029296875)
+        
+        if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            local currentRotation = player.Character.HumanoidRootPart.CFrame.Rotation
+            player.Character:SetPrimaryPartCFrame(CFrame.new(monsterPosition) * CFrame.Angles(0, currentRotation.Y, 0))
+        else
+            warn("Teleport failed! Character or HumanoidRootPart not found.")
+        end
+    end,
 })
 
-local Button = MainTab:CreateButton({
-   Name = "Seaweed",
-   Callback = function()
-       -- Teleport to Ghost Weeds Position Script
+local Dropdown = MainTab:CreateDropdown({
+    Name = "Rice & Seaweed",
+    Options = {"None", "Night Grains", "Ghost Weeds"},
+    CurrentOption = "None",
+    MultiSelection = false, 
+    Flag = "TeleportDropdown", 
+    Callback = function(Option)
+        -- Convert Option to string if it's a table
+        if type(Option) == "table" then
+            Option = Option[1]  -- Take the first element if it's a table
+        end
+        
+        print("Dropdown selected: " .. tostring(Option)) -- Debug print
+        
+        if Option == "None" then
+            print("No option selected") -- Debug print
+        elseif Option == "Night Grains" then
+            print("Attempting to teleport to Night Grains") -- Debug print
+            
+            local player = game.Players.LocalPlayer
+            print("Player found: " .. tostring(player)) -- Debug print
+            
+            local nightGrainsPosition = Vector3.new(-693.851318359375, -156.176513671875, 757.2453002929688)
+ 
+            -- Teleport function to Night Grains location
+            local function teleportToNightGrains()
+                print("Teleport function called") -- Debug print
+                
+                if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                    print("Character and HumanoidRootPart found") -- Debug print
+                    
+                    local currentRotation = player.Character.HumanoidRootPart.CFrame.Rotation
+                    player.Character:SetPrimaryPartCFrame(CFrame.new(nightGrainsPosition) * CFrame.Angles(0, currentRotation.Y, 0))
+                    
+                    print("Teleported to Night Grains") -- Debug print
+                else
+                    print("Character or HumanoidRootPart not found") -- Debug print
+                end
+            end
+ 
+            -- Call the teleport function
+            teleportToNightGrains()
+        elseif Option == "Ghost Weeds" then
+            print("Attempting to teleport to Ghost Weeds") -- Debug print
+            
+            local player = game.Players.LocalPlayer
+            print("Player found: " .. tostring(player)) -- Debug print
+            
+            local ghostWeedsPosition = Vector3.new(-690.3502807617188, -154.32652282714844, 548.877685546875)
+ 
+            -- Teleport function to Ghost Weeds location
+            local function teleportToGhostWeeds()
+                print("Teleport function called") -- Debug print
+                
+                if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                    print("Character and HumanoidRootPart found") -- Debug print
+                    
+                    local currentRotation = player.Character.HumanoidRootPart.CFrame.Rotation
+                    player.Character:SetPrimaryPartCFrame(CFrame.new(ghostWeedsPosition) * CFrame.Angles(0, currentRotation.Y, 0))
+                    
+                    print("Teleported to Ghost Weeds") -- Debug print
+                else
+                    print("Character or HumanoidRootPart not found") -- Debug print
+                end
+            end
+ 
+            -- Call the teleport function
+            teleportToGhostWeeds()
+        end
+    end,
+ })
 
-local player = game.Players.LocalPlayer
-local ghostWeedsPosition = Vector3.new(-690.3502807617188, -154.32652282714844, 548.877685546875)
+ local Dropdown = MainTab:CreateDropdown({
+     Name = "Main Portals",
+     Options = {"None", "Temple", "Ocean", "Fungus", "Hacked Portal (Must Go Through)"},
+     CurrentOption = "None",
+     MultiSelection = false, 
+     Flag = "MainPortalsDropdown", 
+     Callback = function(Option)
+         -- Convert Option to string if it's a table
+         if type(Option) == "table" then
+             Option = Option[1]  -- Take the first element if it's a table
+         end
+         
+         print("Dropdown selected: " .. tostring(Option)) -- Debug print
+         
+         if Option == "None" then
+             print("No portal selected") -- Debug print
+         elseif Option == "Temple" then
+             print("Attempting to teleport to Temple") -- Debug print
+             
+             local player = game.Players.LocalPlayer
+             print("Player found: " .. tostring(player)) -- Debug print
+             
+             local templePosition = Vector3.new(-348.5218811035156, -68.74864196777344, -250.97373962402344)
+  
+             -- Teleport function to Temple location
+             local function teleportToTemple()
+                 print("Teleport function called") -- Debug print
+                 
+                 if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                     print("Character and HumanoidRootPart found") -- Debug print
+                     
+                     local currentRotation = player.Character.HumanoidRootPart.CFrame.Rotation
+                     player.Character:SetPrimaryPartCFrame(CFrame.new(templePosition) * CFrame.Angles(0, currentRotation.Y, 0))
+                     
+                     print("Teleported to Temple") -- Debug print
+                 else
+                     print("Character or HumanoidRootPart not found") -- Debug print
+                 end
+             end
+  
+             -- Call the teleport function
+             teleportToTemple()
+         elseif Option == "Ocean" then
+             print("Attempting to teleport to Ocean") -- Debug print
+             
+             local player = game.Players.LocalPlayer
+             print("Player found: " .. tostring(player)) -- Debug print
+             
+             local oceanPosition = Vector3.new(-60.976417541503906, -12.01259708404541, 388.5896301269531)
+  
+             -- Teleport function to Ocean location
+             local function teleportToOcean()
+                 print("Teleport function called") -- Debug print
+                 
+                 if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                     print("Character and HumanoidRootPart found") -- Debug print
+                     
+                     local currentRotation = player.Character.HumanoidRootPart.CFrame.Rotation
+                     player.Character:SetPrimaryPartCFrame(CFrame.new(oceanPosition) * CFrame.Angles(0, currentRotation.Y, 0))
+                     
+                     print("Teleported to Ocean") -- Debug print
+                 else
+                     print("Character or HumanoidRootPart not found") -- Debug print
+                 end
+             end
+  
+             -- Call the teleport function
+             teleportToOcean()
+         elseif Option == "Fungus" then
+             print("Attempting to teleport to Fungus") -- Debug print
+             
+             local player = game.Players.LocalPlayer
+             print("Player found: " .. tostring(player)) -- Debug print
+             
+             local fungusPosition = Vector3.new(-132.53744506835938, 67.74790954589844, -630.3436889648438)
+  
+             -- Teleport function to Fungus location
+             local function teleportToFungus()
+                 print("Teleport function called") -- Debug print
+                 
+                 if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                     print("Character and HumanoidRootPart found") -- Debug print
+                     
+                     local currentRotation = player.Character.HumanoidRootPart.CFrame.Rotation
+                     player.Character:SetPrimaryPartCFrame(CFrame.new(fungusPosition) * CFrame.Angles(0, currentRotation.Y, 0))
+                     
+                     print("Teleported to Fungus") -- Debug print
+                 else
+                     print("Character or HumanoidRootPart not found") -- Debug print
+                 end
+             end
+  
+             -- Call the teleport function
+             teleportToFungus()
+         elseif Option == "Hacked Portal (Must Go Through)" then
+             print("Attempting to teleport to Hacked Portal") -- Debug print
+             
+             local player = game.Players.LocalPlayer
+             print("Player found: " .. tostring(player)) -- Debug print
+             
+             local hackedPortalPosition = Vector3.new(2088.260009765625, 198.3332977294922, 67.40620422363281)
+  
+             -- Teleport function to Hacked Portal location
+             local function teleportToHackedPortal()
+                 print("Teleport function called") -- Debug print
+                 
+                 if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                     print("Character and HumanoidRootPart found") -- Debug print
+                     
+                     local currentRotation = player.Character.HumanoidRootPart.CFrame.Rotation
+                     player.Character:SetPrimaryPartCFrame(CFrame.new(hackedPortalPosition) * CFrame.Angles(0, currentRotation.Y, 0))
+                     
+                     print("Teleported to Hacked Portal") -- Debug print
+                 else
+                     print("Character or HumanoidRootPart not found") -- Debug print
+                 end
+             end
+  
+             -- Call the teleport function
+             teleportToHackedPortal()
+         end
+     end,
+ })
 
--- Teleport function to Ghost Weeds location
-local function teleportToGhostWeeds()
-    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-        local currentRotation = player.Character.HumanoidRootPart.CFrame.Rotation
-        player.Character:SetPrimaryPartCFrame(CFrame.new(ghostWeedsPosition) * CFrame.Angles(0, currentRotation.Y, 0))
-    end
-end
+ local EndingPortalsDropdown = MainTab:CreateDropdown({
+     Name = "Escape Ending Portals",
+     Options = {"None", "Ending First Portal", "2nd Portal Ending", "3rd Portal Ending", "4th Portal Ending", "FINAL ENDING"},
+     CurrentOption = "None",
+     MultiSelection = false, 
+     Flag = "EndingPortalsDropdown", 
+     Callback = function(Option)
+         -- Convert Option to string if it's a table
+         if type(Option) == "table" then
+             Option = Option[1]  -- Take the first element if it's a table
+         end
+         
+         print("Dropdown selected: " .. tostring(Option)) -- Debug print
+         
+         if Option == "None" then
+             print("No ending portal selected") -- Debug print
+         elseif Option == "Ending First Portal" then
+             print("Attempting to teleport to Ending First Portal") -- Debug print
+             
+             local player = game.Players.LocalPlayer
+             print("Player found: " .. tostring(player)) -- Debug print
+             
+             local endingFirstPortalPosition = Vector3.new(-1252.1890869140625, 735.7387084960938, 240.74395751953125)
+  
+             -- Teleport function to Ending First Portal location
+             local function teleportToEndingFirstPortal()
+                 print("Teleport function called") -- Debug print
+                 
+                 if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                     print("Character and HumanoidRootPart found") -- Debug print
+                     
+                     local currentRotation = player.Character.HumanoidRootPart.CFrame.Rotation
+                     player.Character:SetPrimaryPartCFrame(CFrame.new(endingFirstPortalPosition) * CFrame.Angles(0, currentRotation.Y, 0))
+                     
+                     print("Teleported to Ending First Portal") -- Debug print
+                 else
+                     print("Character or HumanoidRootPart not found") -- Debug print
+                 end
+             end
+  
+             -- Call the teleport function
+             teleportToEndingFirstPortal()
+         elseif Option == "2nd Portal Ending" then
+             print("Attempting to teleport to 2nd Portal Ending") -- Debug print
+             
+             local player = game.Players.LocalPlayer
+             print("Player found: " .. tostring(player)) -- Debug print
+             
+             local endingFirstPortal2Position = Vector3.new(-1219.7113037109375, 835.1122436523438, 980.6454467773438)
+  
+             -- Teleport function to 2nd Portal Ending location
+             local function teleportToEndingFirstPortal2()
+                 print("Teleport function called") -- Debug print
+                 
+                 if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                     print("Character and HumanoidRootPart found") -- Debug print
+                     
+                     local currentRotation = player.Character.HumanoidRootPart.CFrame.Rotation
+                     player.Character:SetPrimaryPartCFrame(CFrame.new(endingFirstPortal2Position) * CFrame.Angles(0, currentRotation.Y, 0))
+                     
+                     print("Teleported to 2nd Portal Ending") -- Debug print
+                 else
+                     print("Character or HumanoidRootPart not found") -- Debug print
+                 end
+             end
+  
+             -- Call the teleport function
+             teleportToEndingFirstPortal2()
+         elseif Option == "3rd Portal Ending" then
+             print("Attempting to teleport to 3rd Portal Ending") -- Debug print
+             
+             local player = game.Players.LocalPlayer
+             print("Player found: " .. tostring(player)) -- Debug print
+             
+             local endingFirstPortal3Position = Vector3.new(-2221.650146484375, 740.9329833984375, 1705.3646240234375)
+  
+             -- Teleport function to 3rd Portal Ending location
+             local function teleportToEndingFirstPortal3()
+                 print("Teleport function called") -- Debug print
+                 
+                 if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                     print("Character and HumanoidRootPart found") -- Debug print
+                     
+                     local currentRotation = player.Character.HumanoidRootPart.CFrame.Rotation
+                     player.Character:SetPrimaryPartCFrame(CFrame.new(endingFirstPortal3Position) * CFrame.Angles(0, currentRotation.Y, 0))
+                     
+                     print("Teleported to 3rd Portal Ending") -- Debug print
+                 else
+                     print("Character or HumanoidRootPart not found") -- Debug print
+                 end
+             end
+  
+             -- Call the teleport function
+             teleportToEndingFirstPortal3()
+         elseif Option == "4th Portal Ending" then
+             print("Attempting to teleport to 4th Portal Ending") -- Debug print
+             
+             local player = game.Players.LocalPlayer
+             print("Player found: " .. tostring(player)) -- Debug print
+             
+             local endingFirstPortal4Position = Vector3.new(-1472.1514892578125, 870.061279296875, 1584.638916015625)
+  
+             -- Teleport function to 4th Portal Ending location
+             local function teleportToEndingFirstPortal4()
+                 print("Teleport function called") -- Debug print
+                 
+                 if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                     print("Character and HumanoidRootPart found") -- Debug print
+                     
+                     local currentRotation = player.Character.HumanoidRootPart.CFrame.Rotation
+                     player.Character:SetPrimaryPartCFrame(CFrame.new(endingFirstPortal4Position) * CFrame.Angles(0, currentRotation.Y, 0))
+                     
+                     print("Teleported to 4th Portal Ending") -- Debug print
+                 else
+                     print("Character or HumanoidRootPart not found") -- Debug print
+                 end
+             end
+  
+             -- Call the teleport function
+             teleportToEndingFirstPortal4()
+         elseif Option == "FINAL ENDING" then
+             print("Attempting to teleport to FINAL ENDING") -- Debug print
+             
+             local player = game.Players.LocalPlayer
+             print("Player found: " .. tostring(player)) -- Debug print
+             
+             local endingFinalPosition = Vector3.new(560.116943359375, 1009.1227416992188, 1688.6771240234375)
+  
+             -- Teleport function to FINAL ENDING location
+             local function teleportToEndingFinal()
+                 print("Teleport function called") -- Debug print
+                 
+                 if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                     print("Character and HumanoidRootPart found") -- Debug print
+                     
+                     local currentRotation = player.Character.HumanoidRootPart.CFrame.Rotation
+                     player.Character:SetPrimaryPartCFrame(CFrame.new(endingFinalPosition) * CFrame.Angles(0, currentRotation.Y, 0))
+                     
+                     print("Teleported to FINAL ENDING") -- Debug print
+                 else
+                     print("Character or HumanoidRootPart not found") -- Debug print
+                 end
+             end
+  
+             -- Call the teleport function
+             teleportToEndingFinal()
+         end
+     end,
+ })
 
--- Call the teleport function
-teleportToGhostWeeds()
-
-   end,
-})
-
-local Button = MainTab:CreateButton({
-   Name = "Temple(Portal 2)",
-   Callback = function()
-       -- Teleport to Temple Position Script
-
-local player = game.Players.LocalPlayer
-local templePosition = Vector3.new(-348.5218811035156, -68.74864196777344, -250.97373962402344)
-
--- Teleport function to Temple location
-local function teleportToTemple()
-    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-        local currentRotation = player.Character.HumanoidRootPart.CFrame.Rotation
-        player.Character:SetPrimaryPartCFrame(CFrame.new(templePosition) * CFrame.Angles(0, currentRotation.Y, 0))
-    end
-end
-
--- Call the teleport function
-teleportToTemple()
-
-   end,
-})
-
-local Button = MainTab:CreateButton({
-   Name = "Ocean(Portal 3)",
-   Callback = function()
-       -- Teleport to Ocean Position Script
-
-local player = game.Players.LocalPlayer
-local oceanPosition = Vector3.new(-60.976417541503906, -12.01259708404541, 388.5896301269531)
-
--- Teleport function to Ocean location
-local function teleportToOcean()
-    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-        local currentRotation = player.Character.HumanoidRootPart.CFrame.Rotation
-        player.Character:SetPrimaryPartCFrame(CFrame.new(oceanPosition) * CFrame.Angles(0, currentRotation.Y, 0))
-    end
-end
-
--- Call the teleport function
-teleportToOcean()
-
-   end,
-})
-
-local Button = MainTab:CreateButton({
-   Name = "Fungus Plant(Portal 4)",
-   Callback = function()
-       -- Teleport to Fungus Position Script
-
-local player = game.Players.LocalPlayer
-local fungusPosition = Vector3.new(-143.5018768310547, 67.74790954589844, -632.1419067382812)
-
--- Teleport function to Fungus location
-local function teleportToFungus()
-    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-        local currentRotation = player.Character.HumanoidRootPart.CFrame.Rotation
-        player.Character:SetPrimaryPartCFrame(CFrame.new(fungusPosition) * CFrame.Angles(0, currentRotation.Y, 0))
-    end
-end
-
--- Call the teleport function
-teleportToFungus()
-
-   end,
-})
-
-local Button = MainTab:CreateButton({
-   Name = "End of Game",
-   Callback = function()
-       -- Teleport to End Position Script
-
-local player = game.Players.LocalPlayer
-local endPosition = Vector3.new(491.50946044921875, 1050.0340576171875, 1703.1329345703125)
-
--- Teleport function to End location
-local function teleportToEnd()
-    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-        local currentRotation = player.Character.HumanoidRootPart.CFrame.Rotation
-        player.Character:SetPrimaryPartCFrame(CFrame.new(endPosition) * CFrame.Angles(0, currentRotation.Y, 0))
-    end
-end
-
--- Call the teleport function
-teleportToEnd()
-
-   end,
-})
-
-local OtherTab = Window:CreateTab("OtherScripts", 4483362458) -- Title, Image
-local Section = OtherTab:CreateSection("Highly Advised")
+local OtherTab = Window:CreateTab("Other Script(2)", nil) -- Title, Image
+local Section = OtherTab:CreateSection("Use it bro")
 
 local Button = OtherTab:CreateButton({
-   Name = "Flyv2",
+   Name = "FLY v2",
    Callback = function()
-       --ARCEUS X FLY V2 SCRIPT BY me_ozoneYT
-loadstring("\108\111\97\100\115\116\114\105\110\103\40\103\97\109\101\58\72\116\116\112\71\101\116\40\40\39\104\116\116\112\115\58\47\47\103\105\115\116\46\103\105\116\104\117\98\117\115\101\114\99\111\110\116\101\110\116\46\99\111\109\47\109\101\111\122\111\110\101\89\84\47\98\102\48\51\55\100\102\102\57\102\48\97\55\48\48\49\55\51\48\52\100\100\100\54\55\102\100\99\100\51\55\48\47\114\97\119\47\101\49\52\101\55\52\102\52\50\53\98\48\54\48\100\102\53\50\51\51\52\51\99\102\51\48\98\55\56\55\48\55\52\101\98\51\99\53\100\50\47\97\114\99\101\117\115\37\50\53\50\48\120\37\50\53\50\48\102\108\121\37\50\53\50\48\50\37\50\53\50\48\111\98\102\108\117\99\97\116\111\114\39\41\44\116\114\117\101\41\41\40\41\10\10")()
+       loadstring(game:HttpGet("https://pastebin.com/raw/fG8BW25Y"))() 
    end,
 })
 
@@ -228,30 +453,15 @@ local Button = OtherTab:CreateButton({
    Name = "Infinite Yield",
    Callback = function()
        loadstring(game:HttpGet("https://rawscripts.net/raw/Infinite-Yield_500"))()
-
    end,
 })
 
 local CreditTab = Window:CreateTab("Credits", nil) -- Title, Image
-local Section = CreditTab:CreateSection("Welcome")
+local Paragraph = CreditTab:CreateParagraph({Title = "Credits", Content = "Hi! :3, My discord is the same as my GitHub @ipeedmyselftosleep. This is my first script and probably the easiest. Any problems with the script please dm me, this is only a quick version of the script I will be doing updates im just trying to figure out the game real quick."})
 
-local Button = CreditTab:CreateButton({
-   Name = "Creator : HI! my name is zay :skull:",
-   Callback = function()
-   -- The function that takes place when the button is pressed
-   end,
-})
-
-local Button = CreditTab:CreateButton({
-   Name = "Discord : If any script problems send to @ipeedmysleftosleep",
-   Callback = function()
-   -- The function that takes place when the button is pressed
-   end,
-})
-
-local Button = CreditTab:CreateButton({
-   Name = "My first script please enjoy :3",
-   Callback = function()
-   -- The function that takes place when the button is pressed
-   end,
+Rayfield:Notify({
+   Title = "Pearl Hub Loaded Successfully",
+   Content = "Enjoy !",
+   Duration = 5,
+   Image = 112992462475311,
 })
